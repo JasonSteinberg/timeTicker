@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"github.com/JasonSteinberg/timeTicker/structs"
+	_ "github.com/go-sql-driver/mysql"
 	"log"
 	"os"
 	"strings"
@@ -45,7 +46,7 @@ func getSqlDB() *sql.DB {
 
 	db, err := sql.Open("mysql", openString)
 	if err != nil {
-		log.Fatal(`Fatal Error: Unable to connect to database, check configuration file`)
+		log.Fatal(`Fatal Error: Unable to connect to database, check configuration file! Error:`, err)
 	}
 
 	return db
