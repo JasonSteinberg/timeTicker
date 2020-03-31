@@ -1,6 +1,7 @@
 package database
 
 import (
+	"database/sql"
 	"encoding/json"
 	"github.com/JasonSteinberg/timeTicker/structs"
 	"log"
@@ -37,4 +38,23 @@ func GetConnectionString() string {
 	connectionString.WriteString(structs.Database.DbName)
 	connectionString.WriteString("?parseTime=true")
 	return connectionString.String()
+}
+
+func getSqlDB() *sql.DB {
+	openString := GetConnectionString()
+
+	db, err := sql.Open("mysql", openString)
+	if err != nil {
+		log.Fatal(`Fatal Error: Unable to connect to database, check configuration file`)
+	}
+
+	return db
+}
+
+func GetSqlReadDB() *sql.DB {
+	return getSqlDB()
+}
+
+func GetSqlWriteDB() *sql.DB {
+	return getSqlDB()
 }
