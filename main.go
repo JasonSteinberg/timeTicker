@@ -1,10 +1,9 @@
-package timeTicker
+package main
 
 import (
-	"fmt"
 	"github.com/JasonSteinberg/timeTicker/database"
 )
 
 func main() {
-	LoadDatabaseConfig
+	database.LoadDatabaseConfig("./production.json")
 }

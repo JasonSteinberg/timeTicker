@@ -1,0 +1,7 @@
+{
+	"user": "ExampleUser",
+	"password": "Password",
+	"url": "127.0.0.1",
+	"port": "3306",
+	"dbname": "timeTicker"
+}
