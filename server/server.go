@@ -3,13 +3,10 @@ package server
 import (
 	// "database/sql"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/JasonSteinberg/timeTicker/structs"
-	"github.com/JasonSteinberg/timeTicker/users"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
-	"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
 )
@@ -32,6 +29,13 @@ func SetUpApi() {
 func healthcheck(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintln(w, `{"Status":"Good"}`)
+}
+
+// curl -X GET --header "Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNvdW50X2Rvb2t1IiwiaXNzIjoiY291cnNlIn0.osrQe3VwnTGqjuhHg36R9DRDt5apXSqb5-5CltMdp6g" http://localhost:8808/protected
+func protected(w http.ResponseWriter, r *http.Request) {
+	HappyMessage := structs.ServerMessage{Message: "You now have access to the protected route!"}
+	w.Header().Set("Content-Type", "application/json")
+	Responder(w, HappyMessage)
 }
 
 func ErrorResponder(w http.ResponseWriter, status int, error structs.ServerMessage) {
@@ -57,119 +61,4 @@ func GenerateToken(user structs.User) string {
 	}
 
 	return tokenString
-}
-
-// curl -X POST -d '{"email":"count_dooku","password":"iHateWookies"}' http://localhost:8808/signup
-func signup(w http.ResponseWriter, r *http.Request) {
-	var user structs.User
-	var error structs.ServerMessage
-
-	json.NewDecoder(r.Body).Decode(&user)
-
-	if user.Email == "" {
-		error.Message = "Email is missing."
-		ErrorResponder(w, http.StatusBadRequest, error)
-		return
-	}
-
-	if user.Password == "" {
-		error.Message = "Password is missing."
-		ErrorResponder(w, http.StatusBadRequest, error)
-		return
-	}
-
-	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	user.Password = string(hash)
-	err = users.CreateUser(user)
-
-	if err != nil {
-		error.Message = err.Error()
-		ErrorResponder(w, http.StatusInternalServerError, error)
-		return
-	}
-
-	HappyMessage := structs.ServerMessage{Message: "Created user successfully"}
-	w.Header().Set("Content-Type", "application/json")
-	Responder(w, HappyMessage)
-}
-
-// curl -X POST -d '{"email":"count_dooku","password":"iHateWookies"}' http://localhost:8808/login
-func login(w http.ResponseWriter, r *http.Request) {
-	var user structs.User
-	var jwToken structs.JWT
-	var error structs.ServerMessage
-
-	json.NewDecoder(r.Body).Decode(&user)
-
-	if user.Email == "" {
-		error.Message = "Email is missing."
-		ErrorResponder(w, http.StatusBadRequest, error)
-		return
-	}
-
-	if user.Password == "" {
-		error.Message = "Password is missing."
-		ErrorResponder(w, http.StatusBadRequest, error)
-		return
-	}
-
-	password := user.Password
-	login, err := users.CheckUser(user, password)
-
-	if err != nil || login == false {
-		error.Message = err.Error()
-		ErrorResponder(w, http.StatusUnauthorized, error)
-		return
-	}
-
-	token := GenerateToken(user)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	w.WriteHeader(http.StatusOK)
-	jwToken.Token = token
-
-	Responder(w, jwToken)
-}
-
-// curl -X GET --header "Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNvdW50X2Rvb2t1IiwiaXNzIjoiY291cnNlIn0.osrQe3VwnTGqjuhHg36R9DRDt5apXSqb5-5CltMdp6g" http://localhost:8808/protected
-func protected(w http.ResponseWriter, r *http.Request) {
-	HappyMessage := structs.ServerMessage{Message: "You now have access to the protected route!"}
-	w.Header().Set("Content-Type", "application/json")
-	Responder(w, HappyMessage)
-}
-
-func ProtectedMiddleWare(next http.HandlerFunc) http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var errorObject structs.ServerMessage
-		authToken := r.Header.Get("Authorization")
-
-		token, error := jwt.Parse(authToken, func(token *jwt.Token) (interface{}, error) {
-			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, errors.New("There was an error!")
-			}
-			return []byte(ultraSecret), nil
-		})
-
-		if error != nil {
-			errorObject.Message = error.Error()
-			ErrorResponder(w, http.StatusUnauthorized, errorObject)
-			return
-		}
-
-		if token.Valid {
-			next.ServeHTTP(w, r)
-		} else {
-			errorObject.Message = error.Error()
-			ErrorResponder(w, http.StatusUnauthorized, errorObject)
-			return
-		}
-	})
 }
