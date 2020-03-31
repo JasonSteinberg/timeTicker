@@ -1,5 +1,7 @@
 package database
 
-func LoadDatabaseConfig() {
+import "fmt"
 
+func LoadDatabaseConfig() {
+	fmt.Println("Hi")
 }

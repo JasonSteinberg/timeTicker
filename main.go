@@ -1,5 +1,10 @@
 package timeTicker
 
-func main() {
+import (
+	"fmt"
+	"github.com/JasonSteinberg/timeTicker/database"
+)
 
+func main() {
+	LoadDatabaseConfig
 }
