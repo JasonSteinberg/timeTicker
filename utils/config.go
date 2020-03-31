@@ -24,5 +24,6 @@ func CheckForEmptyDatabase() {
 }
 
 func setupDatabaseTables() {
-	users.CreateTable()
+	db := database.GetSqlWriteDB()
+	db.Exec(users.CreateTable())
 }
