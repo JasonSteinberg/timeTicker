@@ -27,6 +27,20 @@ func getTask(db *sql.DB, userID int64, taskID int) string {
 	return results
 }
 
+func getCompletedTasks(db *sql.DB, userID int64) string {
+	rows, err := db.Query("select id, name, due_date from task where user_id=? and is_completed = 1;", userID)
+
+	if err != nil {
+		return err.Error()
+	}
+
+	results, err := database.ReturnJson(rows)
+	if err != nil {
+		return err.Error()
+	}
+	return results
+}
+
 func CreateTable() []string {
 	var cmds = []string{`
 create table task

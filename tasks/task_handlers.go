@@ -30,3 +30,9 @@ func task(w http.ResponseWriter, r *http.Request) {
 	user := context.Get(r, users.USERKEY).(structs.User)
 	fmt.Fprintln(w, getTask(database.GetSqlReadDB(), user.ID, id))
 }
+
+// curl -X GET --header "Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNvdW50X2Rvb2t1IiwiaXNzIjoiY291cnNlIn0.osrQe3VwnTGqjuhHg36R9DRDt5apXSqb5-5CltMdp6g" http://localhost:8808/task/completed
+func taskCompleted(w http.ResponseWriter, r *http.Request) {
+	user := context.Get(r, users.USERKEY).(structs.User)
+	fmt.Fprintln(w, getCompletedTasks(database.GetSqlReadDB(), user.ID))
+}
