@@ -55,3 +55,17 @@ func taskNew(w http.ResponseWriter, r *http.Request) {
 	user := context.Get(r, users.USERKEY).(structs.User)
 	fmt.Fprintln(w, createTask(database.GetSqlWriteDB(), user, task))
 }
+
+// curl -X DELETE --header "Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNvdW50X2Rvb2t1IiwiaXNzIjoiY291cnNlIn0.osrQe3VwnTGqjuhHg36R9DRDt5apXSqb5-5CltMdp6g" http://localhost:8808/task/2
+func taskDelete(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+
+	if err != nil {
+		fmt.Fprintln(w, err.Error())
+		return
+	}
+
+	user := context.Get(r, users.USERKEY).(structs.User)
+	fmt.Fprintln(w, deleteTask(database.GetSqlReadDB(), user.ID, id))
+}

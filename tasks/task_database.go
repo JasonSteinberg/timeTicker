@@ -62,6 +62,16 @@ func createTask(db *sql.DB, user structs.User, task structs.Task) string {
 	return ""
 }
 
+func deleteTask(db *sql.DB, userID int64, taskID int) string {
+	_, err := db.Exec("delete from task where user_id=? and id=?;", userID, taskID)
+
+	if err != nil {
+		return err.Error()
+	}
+
+	return ""
+}
+
 func CreateTable() []string {
 	var cmds = []string{`
 create table task
