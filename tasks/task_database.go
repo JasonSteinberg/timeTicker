@@ -62,6 +62,25 @@ func createTask(db *sql.DB, user structs.User, task structs.Task) string {
 	return ""
 }
 
+func updateTask(db *sql.DB, user structs.User, task structs.Task) string {
+
+	var completed = 0
+	if task.IsCompleted {
+		completed = 1
+	}
+
+	_, err := db.Exec(`update task 
+    						  set name=?, due_date=?, is_completed=?
+							  where user_id=? and id=?;`,
+		database.NewNullString(task.Name), database.NewNullDate(task.DueDate), completed, user.ID, task.ID)
+
+	if err != nil {
+		return err.Error()
+	}
+
+	return ""
+}
+
 func deleteTask(db *sql.DB, userID int64, taskID int) string {
 	_, err := db.Exec("delete from task where user_id=? and id=?;", userID, taskID)
 
