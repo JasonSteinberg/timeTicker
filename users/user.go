@@ -9,6 +9,8 @@ import (
 	"log"
 )
 
+const USERKEY = 0
+
 func CreateUser(user structs.User) error {
 	db := database.GetSqlWriteDB()
 
@@ -54,4 +56,19 @@ func CheckUser(userAttempted structs.User, password string) (bool, error) {
 		return false, err
 	}
 	return true, nil
+}
+
+func FillUser(userEmail string) structs.User {
+	user := structs.User{}
+	db := database.GetSqlReadDB()
+	row := db.QueryRow("select id, access from user where email=?", userEmail)
+
+	err := row.Scan(&user.ID, &user.Access)
+	if err != nil {
+		log.Println("User not found!")
+		return structs.User{}
+	}
+	user.Email = userEmail
+
+	return user
 }

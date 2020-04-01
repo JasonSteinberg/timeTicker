@@ -3,7 +3,9 @@ package server
 import (
 	"errors"
 	"github.com/JasonSteinberg/timeTicker/structs"
+	"github.com/JasonSteinberg/timeTicker/users"
 	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/gorilla/context"
 	"net/http"
 )
 
@@ -26,6 +28,9 @@ func ProtectedMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 		}
 
 		if token.Valid {
+			email := token.Claims.(jwt.MapClaims)["email"].(string)
+			user := users.FillUser(email)
+			context.Set(r, users.USERKEY, user)
 			next.ServeHTTP(w, r)
 		} else {
 			errorObject.Message = error.Error()
