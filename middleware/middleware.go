@@ -1,6 +1,7 @@
-package server
+package middleware
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/JasonSteinberg/timeTicker/structs"
 	"github.com/JasonSteinberg/timeTicker/users"
@@ -8,6 +9,11 @@ import (
 	"github.com/gorilla/context"
 	"net/http"
 )
+
+func ErrorResponder(w http.ResponseWriter, status int, error structs.ServerMessage) {
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(error)
+}
 
 func ProtectedMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -18,7 +24,7 @@ func ProtectedMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, errors.New("There was an error!")
 			}
-			return []byte(ultraSecret), nil
+			return []byte(structs.UltraSecret), nil
 		})
 
 		if error != nil {

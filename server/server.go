@@ -4,21 +4,26 @@ import (
 	// "database/sql"
 	"encoding/json"
 	"fmt"
+	"github.com/JasonSteinberg/timeTicker/middleware"
 	"github.com/JasonSteinberg/timeTicker/structs"
+	"github.com/JasonSteinberg/timeTicker/tasks"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 )
 
-var ultraSecret = "buodcx3d4t06f0m1ld89ABCDEFGHIJKLMNOPQRSTUVWXYZfqpls" // Change and Do *NOT* put on github
+
 
 func SetUpApi() {
 	router := mux.NewRouter()
 	router.HandleFunc("/healthcheck", healthcheck).Methods("GET")
 	router.HandleFunc("/signup", signup).Methods("POST")
 	router.HandleFunc("/login", login).Methods("POST")
-	router.HandleFunc("/protected", ProtectedMiddleWare(protected)).Methods("GET")
+	router.HandleFunc("/protected", middleware.ProtectedMiddleWare(protected)).Methods("GET")
+
+	tasks.SetUpTaskRoutes(router)
+
 
 	log.Println("Starting server on port 8808.")
 	log.Fatal(http.ListenAndServe(":8808", router)) // <- Do *NOT* use unencrypted version in production
@@ -54,7 +59,7 @@ func GenerateToken(user structs.User) string {
 		"iss":   "course",
 	})
 
-	tokenString, err := token.SignedString([]byte(ultraSecret))
+	tokenString, err := token.SignedString([]byte(structs.UltraSecret))
 
 	if err != nil {
 		log.Fatal("Oh no token failure! ", err)

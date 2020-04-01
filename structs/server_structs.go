@@ -14,3 +14,5 @@ type User struct {
 type JWT struct {
 	Token string `json:"token"`
 }
+
+var UltraSecret = "buodcx3d4t06f0m1ld89ABCDEFGHIJKLMNOPQRSTUVWXYZfqpls" // Change and Do *NOT* put on github
