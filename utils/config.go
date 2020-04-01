@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"github.com/JasonSteinberg/timeTicker/database"
+	"github.com/JasonSteinberg/timeTicker/tasks"
 	"github.com/JasonSteinberg/timeTicker/users"
 	"log"
 )
@@ -26,4 +27,8 @@ func CheckForEmptyDatabase() {
 func setupDatabaseTables() {
 	db := database.GetSqlWriteDB()
 	db.Exec(users.CreateTable())
+
+	for _, cmd := range tasks.CreateTable() {
+		db.Exec(cmd)
+	}
 }
