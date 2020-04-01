@@ -1,19 +1,14 @@
 package middleware
 
 import (
-	"encoding/json"
 	"errors"
+	"github.com/JasonSteinberg/timeTicker/responses"
 	"github.com/JasonSteinberg/timeTicker/structs"
 	"github.com/JasonSteinberg/timeTicker/users"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/context"
 	"net/http"
 )
-
-func ErrorResponder(w http.ResponseWriter, status int, error structs.ServerMessage) {
-	w.WriteHeader(status)
-	json.NewEncoder(w).Encode(error)
-}
 
 func ProtectedMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -29,7 +24,7 @@ func ProtectedMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 
 		if error != nil {
 			errorObject.Message = error.Error()
-			ErrorResponder(w, http.StatusUnauthorized, errorObject)
+			responses.ErrorResponder(w, http.StatusUnauthorized, errorObject)
 			return
 		}
 
@@ -40,7 +35,7 @@ func ProtectedMiddleWare(next http.HandlerFunc) http.HandlerFunc {
 			next.ServeHTTP(w, r)
 		} else {
 			errorObject.Message = error.Error()
-			ErrorResponder(w, http.StatusUnauthorized, errorObject)
+			responses.ErrorResponder(w, http.StatusUnauthorized, errorObject)
 			return
 		}
 	})

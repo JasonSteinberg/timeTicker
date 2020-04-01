@@ -3,10 +3,12 @@ package tasks
 import (
 	"database/sql"
 	"github.com/JasonSteinberg/timeTicker/database"
+	"github.com/JasonSteinberg/timeTicker/structs"
 )
 
 func getOpenTasks(db *sql.DB, userID int64) string {
 	rows, err := db.Query("select id, name, due_date from task where user_id=? and is_completed != 1;", userID)
+	defer rows.Close()
 
 	if err != nil {
 		return err.Error()
@@ -18,6 +20,7 @@ func getOpenTasks(db *sql.DB, userID int64) string {
 
 func getTask(db *sql.DB, userID int64, taskID int) string {
 	rows, err := db.Query("select id, name, due_date from task where user_id=? and id=?;", userID, taskID)
+	defer rows.Close()
 
 	if err != nil {
 		return err.Error()
@@ -29,6 +32,7 @@ func getTask(db *sql.DB, userID int64, taskID int) string {
 
 func getCompletedTasks(db *sql.DB, userID int64) string {
 	rows, err := db.Query("select id, name, due_date from task where user_id=? and is_completed = 1;", userID)
+	defer rows.Close()
 
 	if err != nil {
 		return err.Error()
@@ -39,6 +43,23 @@ func getCompletedTasks(db *sql.DB, userID int64) string {
 		return err.Error()
 	}
 	return results
+}
+
+func createTask(db *sql.DB, user structs.User, task structs.Task) string {
+
+	var completed = 0
+	if task.IsCompleted {
+		completed = 1
+	}
+
+	_, err := db.Exec("insert into task (user_id, name, due_date, is_completed) values (?,?,?,?);",
+		user.ID, database.NewNullString(task.Name), database.NewNullDate(task.DueDate), completed)
+
+	if err != nil {
+		return err.Error()
+	}
+
+	return ""
 }
 
 func CreateTable() []string {

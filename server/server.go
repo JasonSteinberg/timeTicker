@@ -1,10 +1,9 @@
 package server
 
 import (
-	// "database/sql"
-	"encoding/json"
 	"fmt"
 	"github.com/JasonSteinberg/timeTicker/middleware"
+	"github.com/JasonSteinberg/timeTicker/responses"
 	"github.com/JasonSteinberg/timeTicker/structs"
 	"github.com/JasonSteinberg/timeTicker/tasks"
 	jwt "github.com/dgrijalva/jwt-go"
@@ -12,8 +11,6 @@ import (
 	"log"
 	"net/http"
 )
-
-
 
 func SetUpApi() {
 	router := mux.NewRouter()
@@ -23,7 +20,6 @@ func SetUpApi() {
 	router.HandleFunc("/protected", middleware.ProtectedMiddleWare(protected)).Methods("GET")
 
 	tasks.SetUpTaskRoutes(router)
-
 
 	log.Println("Starting server on port 8808.")
 	log.Fatal(http.ListenAndServe(":8808", router)) // <- Do *NOT* use unencrypted version in production
@@ -40,16 +36,7 @@ func healthcheck(w http.ResponseWriter, r *http.Request) {
 func protected(w http.ResponseWriter, r *http.Request) {
 	HappyMessage := structs.ServerMessage{Message: "You now have access to the protected route!"}
 	w.Header().Set("Content-Type", "application/json")
-	Responder(w, HappyMessage)
-}
-
-func ErrorResponder(w http.ResponseWriter, status int, error structs.ServerMessage) {
-	w.WriteHeader(status)
-	json.NewEncoder(w).Encode(error)
-}
-
-func Responder(w http.ResponseWriter, response interface{}) {
-	json.NewEncoder(w).Encode(response)
+	responses.Responder(w, HappyMessage)
 }
 
 func GenerateToken(user structs.User) string {

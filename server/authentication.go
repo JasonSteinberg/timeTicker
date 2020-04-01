@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"github.com/JasonSteinberg/timeTicker/responses"
 	"log"
 	"net/http"
 
@@ -19,13 +20,13 @@ func signup(w http.ResponseWriter, r *http.Request) {
 
 	if user.Email == "" {
 		error.Message = "Email is missing."
-		ErrorResponder(w, http.StatusBadRequest, error)
+		responses.ErrorResponder(w, http.StatusBadRequest, error)
 		return
 	}
 
 	if user.Password == "" {
 		error.Message = "Password is missing."
-		ErrorResponder(w, http.StatusBadRequest, error)
+		responses.ErrorResponder(w, http.StatusBadRequest, error)
 		return
 	}
 
@@ -40,13 +41,13 @@ func signup(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		error.Message = err.Error()
-		ErrorResponder(w, http.StatusInternalServerError, error)
+		responses.ErrorResponder(w, http.StatusInternalServerError, error)
 		return
 	}
 
 	HappyMessage := structs.ServerMessage{Message: "Created user successfully"}
 	w.Header().Set("Content-Type", "application/json")
-	Responder(w, HappyMessage)
+	responses.Responder(w, HappyMessage)
 }
 
 // curl -X POST -d '{"email":"count_dooku","password":"iHateWookies"}' http://localhost:8808/login
@@ -59,13 +60,13 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 	if user.Email == "" {
 		error.Message = "Email is missing."
-		ErrorResponder(w, http.StatusBadRequest, error)
+		responses.ErrorResponder(w, http.StatusBadRequest, error)
 		return
 	}
 
 	if user.Password == "" {
 		error.Message = "Password is missing."
-		ErrorResponder(w, http.StatusBadRequest, error)
+		responses.ErrorResponder(w, http.StatusBadRequest, error)
 		return
 	}
 
@@ -74,7 +75,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil || login == false {
 		error.Message = err.Error()
-		ErrorResponder(w, http.StatusUnauthorized, error)
+		responses.ErrorResponder(w, http.StatusUnauthorized, error)
 		return
 	}
 
@@ -87,5 +88,5 @@ func login(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	jwToken.Token = token
 
-	Responder(w, jwToken)
+	responses.Responder(w, jwToken)
 }

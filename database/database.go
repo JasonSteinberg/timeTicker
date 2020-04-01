@@ -7,7 +7,9 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"log"
 	"os"
+	"strconv"
 	"strings"
+	"time"
 )
 
 func LoadDatabaseConfig(fileName string) {
@@ -60,7 +62,6 @@ func GetSqlWriteDB() *sql.DB {
 	return getSqlDB()
 }
 
-
 // From https://stackoverflow.com/questions/19991541
 func ReturnJson(rows *sql.Rows) (string, error) {
 	columns, err := rows.Columns()
@@ -104,4 +105,44 @@ func ReturnJson(rows *sql.Rows) (string, error) {
 	}
 
 	return string(jsonData), nil
+}
+
+func NewNullString(s string) sql.NullString {
+	if len(s) == 0 || s == "<nil>" {
+		return sql.NullString{}
+	}
+	return sql.NullString{
+		String: s,
+		Valid:  true,
+	}
+}
+
+func NewNullDate(t time.Time) sql.NullTime {
+	if strings.HasPrefix(t.String(), "0001-01-01") {
+		return sql.NullTime{}
+	}
+	return sql.NullTime{
+		Time:  t,
+		Valid: true,
+	}
+}
+
+func NewNullInt(s string) sql.NullInt64 {
+	if len(s) == 0 || s == "<nil>" {
+		return sql.NullInt64{
+			Valid: false,
+		}
+	}
+
+	tmpInt, err := strconv.Atoi(s)
+	if err != nil {
+		return sql.NullInt64{
+			Valid: false,
+		}
+	}
+
+	return sql.NullInt64{
+		Int64: int64(tmpInt),
+		Valid: true,
+	}
 }
