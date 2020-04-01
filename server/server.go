@@ -8,6 +8,7 @@ import (
 	"github.com/JasonSteinberg/timeTicker/tasks"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 	"log"
 	"net/http"
 )
@@ -21,9 +22,11 @@ func SetUpApi() {
 
 	tasks.SetUpTaskRoutes(router)
 
+	c := cors.AllowAll()
+	handler := c.Handler(router)
 	log.Println("Starting server on port 8808.")
-	log.Fatal(http.ListenAndServe(":8808", router)) // <- Do *NOT* use unencrypted version in production
-	// log.Fatal(http.ListenAndServeTLS(":8808", "certificate.pem", "key.pem", router))  // <-- Use this one! (After you generate encryption)
+	log.Fatal(http.ListenAndServe(":8808", handler)) // <- Do *NOT* use unencrypted version in production
+	// log.Fatal(http.ListenAndServeTLS(":8808", "certificate.pem", "key.pem", handler))  // <-- Use this one! (After you generate encryption)
 }
 
 // curl -v http://localhost:8808/healthcheck
