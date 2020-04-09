@@ -6,6 +6,7 @@ import (
 	"github.com/JasonSteinberg/timeTicker/responses"
 	"github.com/JasonSteinberg/timeTicker/structs"
 	"github.com/JasonSteinberg/timeTicker/tasks"
+	timeLog "github.com/JasonSteinberg/timeTicker/time"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
@@ -21,6 +22,7 @@ func SetUpApi() {
 	router.HandleFunc("/protected", middleware.ProtectedMiddleWare(protected)).Methods("GET")
 
 	tasks.SetUpTaskRoutes(router)
+	timeLog.SetUpTimeRoutes(router)
 
 	c := cors.AllowAll()
 	handler := c.Handler(router)
