@@ -21,6 +21,13 @@ type Task struct {
 	IsCompleted bool      `json:"is_completed"`
 }
 
+type TimeRequest struct {
+	ID           int       `json:"id"`
+	UserID       string    `json:"user_id"`
+	LoggedTime   string    `json:"logged_time"`
+	HappenedDate time.Time `json:"happened_date"`
+}
+
 type JWT struct {
 	Token string `json:"token"`
 }
