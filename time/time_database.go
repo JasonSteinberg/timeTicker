@@ -7,6 +7,7 @@ create table time
 	id int auto_increment,
 	user_id int null,
 	time_log float(4,2) not null,
+	happened_date date null,
 	constraint time_pk
 		primary key (id),
 	constraint User
