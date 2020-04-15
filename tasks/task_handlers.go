@@ -6,8 +6,6 @@ import (
 	"github.com/JasonSteinberg/timeTicker/database"
 	"github.com/JasonSteinberg/timeTicker/responses"
 	"github.com/JasonSteinberg/timeTicker/structs"
-	"github.com/JasonSteinberg/timeTicker/users"
-	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
@@ -15,7 +13,7 @@ import (
 
 // curl -X GET --header "Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNvdW50X2Rvb2t1IiwiaXNzIjoiY291cnNlIn0.osrQe3VwnTGqjuhHg36R9DRDt5apXSqb5-5CltMdp6g" http://localhost:8808/tasks
 func tasks(w http.ResponseWriter, r *http.Request) {
-	user := context.Get(r, users.USERKEY).(structs.User)
+	user := r.Context().Value("User").(structs.User)
 	fmt.Fprintln(w, getOpenTasks(database.GetSqlReadDB(), user.ID))
 }
 
@@ -29,13 +27,13 @@ func task(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := context.Get(r, users.USERKEY).(structs.User)
+	user := r.Context().Value("User").(structs.User)
 	fmt.Fprintln(w, getTask(database.GetSqlReadDB(), user.ID, id))
 }
 
 // curl -X GET --header "Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNvdW50X2Rvb2t1IiwiaXNzIjoiY291cnNlIn0.osrQe3VwnTGqjuhHg36R9DRDt5apXSqb5-5CltMdp6g" -X POST http://localhost:8808/task/completed
 func taskCompleted(w http.ResponseWriter, r *http.Request) {
-	user := context.Get(r, users.USERKEY).(structs.User)
+	user := r.Context().Value("User").(structs.User)
 	fmt.Fprintln(w, getCompletedTasks(database.GetSqlReadDB(), user.ID))
 }
 
@@ -52,7 +50,7 @@ func taskNew(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := context.Get(r, users.USERKEY).(structs.User)
+	user := r.Context().Value("User").(structs.User)
 	fmt.Fprintln(w, createTask(database.GetSqlWriteDB(), user, task))
 }
 
@@ -78,7 +76,7 @@ func taskUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	task.ID = id
-	user := context.Get(r, users.USERKEY).(structs.User)
+	user := r.Context().Value("User").(structs.User)
 	fmt.Fprintln(w, updateTask(database.GetSqlWriteDB(), user, task))
 }
 
@@ -92,6 +90,6 @@ func taskDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := context.Get(r, users.USERKEY).(structs.User)
+	user := r.Context().Value("User").(structs.User)
 	fmt.Fprintln(w, deleteTask(database.GetSqlReadDB(), user.ID, id))
 }

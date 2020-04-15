@@ -6,8 +6,6 @@ import (
 	"github.com/JasonSteinberg/timeTicker/database"
 	"github.com/JasonSteinberg/timeTicker/responses"
 	"github.com/JasonSteinberg/timeTicker/structs"
-	"github.com/JasonSteinberg/timeTicker/users"
-	"github.com/gorilla/context"
 	"net/http"
 )
 
@@ -23,6 +21,6 @@ func timeAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := context.Get(r, users.USERKEY).(structs.User)
+	user := r.Context().Value("User").(structs.User)
 	fmt.Fprintln(w, createTime(database.GetSqlWriteDB(), user, timeLog))
 }
